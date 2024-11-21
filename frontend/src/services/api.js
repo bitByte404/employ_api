@@ -51,9 +51,7 @@ export const recommendationAPI = {
 };
 
 export const statisticsAPI = {
-  getStatistics: () => api.get('/statistics'),
-  getAnalysisData: () => api.get('/statistics/analysis'),
-  exportReport: () => api.get('/statistics/export', { responseType: 'blob' }),
+  getStatistics: () => api.get('/api/statistics'),
 };
 
 export const graduateAPI = {
