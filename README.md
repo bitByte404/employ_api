@@ -1,25 +1,65 @@
 # 智绘未来：高校学生发展智导站
 
-## 项目简介
-智绘未来是一个面向高校学生的职业发展指导平台，通过智能算法为学生提供个性化的职业规划和学业指导服务。
+## 项目介绍
+智绘未来是一个面向高校学生的职业发展智能导航平台，旨在通过数据分析和智能算法，为学生提供个性化的职业规划和学业指导服务。
+
+### 主要功能
+- 🔐 用户认证与授权
+  - 账号注册与登录
+  - JWT token 认证
+  - 角色权限管理
+
+- 👤 个人信息管理
+  - 基本信息维护
+  - 学业信息记录
+  - 个人档案管理
+
+- 📊 职业测评系统
+  - MBTI 性格测试
+  - Holland 职业兴趣测试
+  - 测试结果分析
+
+- 🎯 智能推荐系统
+  - 基于专业的职业推荐
+  - 个性化发展路径规划
+  - 相似案例推荐
+
+- 📈 数据分析与可视化
+  - 就业趋势分析
+  - 专业分布统计
+  - 职业发展追踪
+
+- 👨‍💼 管理员功能
+  - 用户管理
+  - 数据维护
+  - 系统监控
 
 ## 技术栈
+### 后端
 - Spring Boot 3.1.5
-- Spring Security
+- Spring Security + JWT
 - Spring Data JPA
 - MySQL 8.0
-- JWT
-- Lombok
 - Maven
 
-## 系统要求
-- JDK 17+
-- MySQL 8.0+
-- Maven 3.6+
+### 前端
+- React 18
+- Material-UI (MUI)
+- Redux Toolkit
+- React Router
+- Axios
+- Recharts
 
 ## 快速开始
 
-### 1. 数据库配置
+### 环境要求
+- JDK 17+
+- Node.js 16+
+- MySQL 8.0+
+- Maven 3.6+
+
+### 数据库配置
+1. 创建数据库：
 ``` sql
 CREATE DATABASE student_guidance DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
