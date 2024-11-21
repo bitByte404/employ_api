@@ -16,6 +16,7 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { testAPI } from '../../services/api';
+import { ArrowBack, ArrowForward, Send } from '@mui/icons-material';
 
 // Holland职业兴趣测试题目
 const questions = [
@@ -206,34 +207,88 @@ const CareerTest = () => {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Card>
-        <CardContent>
-          <Typography variant="h5" gutterBottom color="primary">
-            职业兴趣测试
-          </Typography>
-          {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
-            </Alert>
-          )}
-          
-          <Box sx={{ mb: 3 }}>
-            <LinearProgress 
-              variant="determinate" 
-              value={getProgress()} 
-              sx={{ height: 10, borderRadius: 5 }}
-            />
-            <Typography variant="body2" color="textSecondary" align="right" sx={{ mt: 1 }}>
-              完成度: {Math.round(getProgress())}%
+    <Box sx={{ p: 3, maxWidth: 1200, mx: 'auto' }}>
+      <Card 
+        elevation={3}
+        sx={{ 
+          borderRadius: 4,
+          background: 'linear-gradient(145deg, #ffffff 0%, #f5f5f5 100%)',
+        }}
+      >
+        <CardContent sx={{ p: 4 }}>
+          {/* 标题部分 */}
+          <Box sx={{ mb: 4, textAlign: 'center' }}>
+            <Typography 
+              variant="h4" 
+              gutterBottom 
+              sx={{
+                fontWeight: 600,
+                background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent'
+              }}
+            >
+              职业兴趣测试
+            </Typography>
+            <Typography variant="subtitle1" color="text.secondary">
+              通过本测试，我们将帮助你发现最适合的职业方向
             </Typography>
           </Box>
 
+          {/* 进度条 */}
           <Box sx={{ mb: 4 }}>
-            <Typography variant="h6" gutterBottom>
+            <LinearProgress 
+              variant="determinate" 
+              value={getProgress()} 
+              sx={{ 
+                height: 10, 
+                borderRadius: 5,
+                backgroundColor: 'rgba(0,0,0,0.05)',
+                '& .MuiLinearProgress-bar': {
+                  background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+                  borderRadius: 5,
+                }
+              }}
+            />
+            <Box sx={{ 
+              display: 'flex', 
+              justifyContent: 'space-between',
+              mt: 1
+            }}>
+              <Typography variant="body2" color="text.secondary">
+                第 {activeStep + 1} 题，共 {questions.length} 题
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                完成度: {Math.round(getProgress())}%
+              </Typography>
+            </Box>
+          </Box>
+
+          {/* 问题卡片 */}
+          <Paper 
+            elevation={2}
+            sx={{ 
+              p: 4, 
+              mb: 4, 
+              borderRadius: 3,
+              backgroundColor: 'rgba(255,255,255,0.8)',
+              transition: 'transform 0.3s ease-in-out',
+              '&:hover': {
+                transform: 'translateY(-4px)'
+              }
+            }}
+          >
+            <Typography 
+              variant="h6" 
+              gutterBottom
+              sx={{ 
+                color: '#1976d2',
+                fontWeight: 500
+              }}
+            >
               {questions[activeStep].question}
             </Typography>
-            <Box sx={{ px: 2, py: 3 }}>
+            <Box sx={{ px: 2, py: 4 }}>
               <Slider
                 value={answers[questions[activeStep].id] || 3}
                 onChange={(_, value) => handleAnswer(questions[activeStep].id, value)}
@@ -250,17 +305,41 @@ const CareerTest = () => {
                 sx={{
                   '& .MuiSlider-markLabel': {
                     fontSize: '0.875rem',
+                    color: 'text.secondary'
+                  },
+                  '& .MuiSlider-track': {
+                    background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+                  },
+                  '& .MuiSlider-thumb': {
+                    backgroundColor: '#fff',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                    '&:hover, &.Mui-focusVisible': {
+                      boxShadow: '0 4px 8px rgba(0,0,0,0.15)',
+                    }
                   }
                 }}
               />
             </Box>
-          </Box>
+          </Paper>
 
-          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          {/* 导航按钮 */}
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'space-between',
+            gap: 2
+          }}>
             <Button
               variant="outlined"
               onClick={() => setActiveStep(prev => prev - 1)}
               disabled={activeStep === 0}
+              startIcon={<ArrowBack />}
+              sx={{
+                borderRadius: 2,
+                px: 4,
+                py: 1.5,
+                textTransform: 'none',
+                fontWeight: 500
+              }}
             >
               上一题
             </Button>
@@ -269,13 +348,39 @@ const CareerTest = () => {
                 variant="contained"
                 onClick={handleSubmit}
                 disabled={Object.keys(answers).length !== questions.length}
+                endIcon={<Send />}
+                sx={{
+                  borderRadius: 2,
+                  px: 4,
+                  py: 1.5,
+                  textTransform: 'none',
+                  fontWeight: 500,
+                  background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+                  boxShadow: '0 3px 5px 2px rgba(33, 203, 243, .3)',
+                  '&:hover': {
+                    background: 'linear-gradient(45deg, #1976d2 30%, #2196F3 90%)',
+                  }
+                }}
               >
-                提交
+                提交测试
               </Button>
             ) : (
               <Button
                 variant="contained"
                 onClick={() => setActiveStep(prev => prev + 1)}
+                endIcon={<ArrowForward />}
+                sx={{
+                  borderRadius: 2,
+                  px: 4,
+                  py: 1.5,
+                  textTransform: 'none',
+                  fontWeight: 500,
+                  background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+                  boxShadow: '0 3px 5px 2px rgba(33, 203, 243, .3)',
+                  '&:hover': {
+                    background: 'linear-gradient(45deg, #1976d2 30%, #2196F3 90%)',
+                  }
+                }}
               >
                 下一题
               </Button>
