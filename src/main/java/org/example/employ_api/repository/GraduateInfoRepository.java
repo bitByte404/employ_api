@@ -4,13 +4,13 @@ import org.example.employ_api.model.GraduateInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
+import org.springframework.stereotype.Repository;
 import java.util.List;
 
+@Repository
 public interface GraduateInfoRepository extends JpaRepository<GraduateInfo, Long> {
     List<GraduateInfo> findByMajor(String major);
     List<GraduateInfo> findByCareerPath(String careerPath);
-    List<GraduateInfo> findByExperienceType(String experienceType);
     
     @Query("SELECT g FROM GraduateInfo g WHERE " +
            "(:major IS NULL OR g.major = :major) AND " +

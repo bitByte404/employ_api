@@ -12,9 +12,9 @@ public class GraduateInfoDto {
     private String workplace;
     private String position;
     private String location;
-    private String experience;
-    private String experienceType;
     private Double gpa;
     private String awards;
     private String skills;
+    private String experience;
+    private String experienceType;
 } 
