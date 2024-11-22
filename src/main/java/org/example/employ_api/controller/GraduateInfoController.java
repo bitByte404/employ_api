@@ -4,16 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.example.employ_api.dto.GraduateInfoDto;
 import org.example.employ_api.service.GraduateInfoService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/graduate-info")
+@RequestMapping("/api/graduates")
 @RequiredArgsConstructor
 public class GraduateInfoController {
-
     private final GraduateInfoService graduateInfoService;
 
     @GetMapping
@@ -27,13 +25,26 @@ public class GraduateInfoController {
             @RequestParam(required = false) String careerPath,
             @RequestParam(required = false) String experienceType) {
         return ResponseEntity.ok(
-                graduateInfoService.getGraduateInfoByFilters(major, careerPath, experienceType));
+            graduateInfoService.getGraduateInfoByFilters(major, careerPath, experienceType)
+        );
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GraduateInfoDto> createGraduateInfo(
             @RequestBody GraduateInfoDto graduateInfoDto) {
         return ResponseEntity.ok(graduateInfoService.createGraduateInfo(graduateInfoDto));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<GraduateInfoDto> updateGraduateInfo(
+            @PathVariable Long id,
+            @RequestBody GraduateInfoDto graduateInfoDto) {
+        return ResponseEntity.ok(graduateInfoService.updateGraduateInfo(id, graduateInfoDto));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteGraduateInfo(@PathVariable Long id) {
+        graduateInfoService.deleteGraduateInfo(id);
+        return ResponseEntity.ok().build();
     }
 } 

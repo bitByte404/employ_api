@@ -8,6 +8,6 @@ public class UserAuditDto {
     private String username;
     private String realName;
     private String studentId;
-    private String status;  // PENDING, APPROVED, REJECTED
-    private String comment; // 审核意见
+    private String status;
+    private String comment;
 } 

@@ -13,6 +13,7 @@ const authSlice = createSlice({
     setCredentials: (state, action) => {
       state.token = action.payload.token;
       state.isAuthenticated = true;
+      state.user = action.payload.user;
       localStorage.setItem('token', action.payload.token);
     },
     setUser: (state, action) => {

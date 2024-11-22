@@ -22,8 +22,9 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    if (error.response?.status === 403 || error.response?.status === 401) {
       store.dispatch(logout());
+      window.location.href = '/login';
     }
     return Promise.reject(error);
   }
@@ -40,8 +41,8 @@ export const userAPI = {
 };
 
 export const testAPI = {
-  submitPersonalityTest: (data) => api.post('/api/tests/personality', data),
-  submitCareerTest: (data) => api.post('/api/tests/career-interest', data),
+  submitPersonalityTest: (data) => api.post('/tests/personality', data),
+  submitCareerTest: (data) => api.post('/tests/career-interest', data),
 };
 
 export const recommendationAPI = {
@@ -51,7 +52,9 @@ export const recommendationAPI = {
 };
 
 export const statisticsAPI = {
-  getStatistics: () => api.get('/api/statistics'),
+  getStatistics: () => api.get('/statistics'),
+  getAnalysisData: () => api.get('/statistics/analysis'),
+  exportReport: () => api.get('/statistics/export', { responseType: 'blob' }),
 };
 
 export const graduateAPI = {

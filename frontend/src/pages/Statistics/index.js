@@ -11,6 +11,8 @@ import {
 import {
   BarChart,
   Bar,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -31,19 +33,19 @@ const Statistics = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchStatistics = async () => {
-      try {
-        const response = await statisticsAPI.getStatistics();
-        setData(response.data);
-      } catch (error) {
-        setError(error.response?.data?.message || '获取统计数据失败');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchStatistics();
   }, []);
+
+  const fetchStatistics = async () => {
+    try {
+      const response = await statisticsAPI.getStatistics();
+      setData(response.data);
+    } catch (error) {
+      setError('获取统计数据失败');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -61,20 +63,12 @@ const Statistics = () => {
     );
   }
 
-  const careerPathData = Object.entries(data?.careerPathDistribution || {}).map(
-    ([name, value]) => ({ name, value })
-  );
-
-  const majorData = Object.entries(data?.majorDistribution || {}).map(
-    ([name, value]) => ({ name, value })
-  );
-
-  const locationData = Object.entries(data?.locationDistribution || {}).map(
-    ([name, value]) => ({ name, value })
-  );
-
   return (
     <Box sx={{ p: 3 }}>
+      <Typography variant="h4" gutterBottom>
+        数据统计分析
+      </Typography>
+
       <Grid container spacing={3}>
         {/* 就业去向分布 */}
         <Grid item xs={12} md={6}>
@@ -84,10 +78,10 @@ const Statistics = () => {
                 就业去向分布
               </Typography>
               <Box sx={{ height: 300 }}>
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer>
                   <PieChart>
                     <Pie
-                      data={careerPathData}
+                      data={data?.careerPathDistribution || []}
                       dataKey="value"
                       nameKey="name"
                       cx="50%"
@@ -95,7 +89,7 @@ const Statistics = () => {
                       outerRadius={100}
                       label
                     >
-                      {careerPathData.map((entry, index) => (
+                      {(data?.careerPathDistribution || []).map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
@@ -116,13 +110,12 @@ const Statistics = () => {
                 专业分布
               </Typography>
               <Box sx={{ height: 300 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={majorData}>
+                <ResponsiveContainer>
+                  <BarChart data={data?.majorDistribution || []}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis />
                     <Tooltip />
-                    <Legend />
                     <Bar dataKey="value" fill="#8884d8" />
                   </BarChart>
                 </ResponsiveContainer>
@@ -131,21 +124,45 @@ const Statistics = () => {
           </Card>
         </Grid>
 
-        {/* 地域分布 */}
+        {/* 就业趋势分析 */}
         <Grid item xs={12}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
-                地域分布
+                就业趋势分析
               </Typography>
               <Box sx={{ height: 400 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={locationData} layout="vertical">
+                <ResponsiveContainer>
+                  <LineChart data={data?.employmentTrends || []}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis type="number" />
-                    <YAxis dataKey="name" type="category" width={100} />
+                    <XAxis dataKey="year" />
+                    <YAxis />
                     <Tooltip />
                     <Legend />
+                    <Line type="monotone" dataKey="就业率" stroke="#8884d8" />
+                    <Line type="monotone" dataKey="考研率" stroke="#82ca9d" />
+                    <Line type="monotone" dataKey="出国率" stroke="#ffc658" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* 平均GPA分布 */}
+        <Grid item xs={12} md={6}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                各专业平均GPA
+              </Typography>
+              <Box sx={{ height: 300 }}>
+                <ResponsiveContainer>
+                  <BarChart data={data?.gpaDistribution || []}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis domain={[0, 4]} />
+                    <Tooltip />
                     <Bar dataKey="value" fill="#82ca9d" />
                   </BarChart>
                 </ResponsiveContainer>
@@ -154,25 +171,32 @@ const Statistics = () => {
           </Card>
         </Grid>
 
-        {/* 平均GPA */}
-        <Grid item xs={12}>
+        {/* 地域分布 */}
+        <Grid item xs={12} md={6}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
-                各专业平均GPA
+                就业地域分布
               </Typography>
               <Box sx={{ height: 300 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={Object.entries(data?.averageGpaByMajor || {}).map(
-                    ([name, value]) => ({ name, value })
-                  )}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis domain={[0, 5]} />
+                <ResponsiveContainer>
+                  <PieChart>
+                    <Pie
+                      data={data?.locationDistribution || []}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={100}
+                      label
+                    >
+                      {(data?.locationDistribution || []).map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
                     <Tooltip />
                     <Legend />
-                    <Bar dataKey="value" fill="#ffc658" />
-                  </BarChart>
+                  </PieChart>
                 </ResponsiveContainer>
               </Box>
             </CardContent>

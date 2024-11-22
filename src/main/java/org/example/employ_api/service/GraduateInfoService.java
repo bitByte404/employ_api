@@ -16,12 +16,14 @@ public class GraduateInfoService {
 
     private final GraduateInfoRepository graduateInfoRepository;
 
+    @Transactional(readOnly = true)
     public List<GraduateInfoDto> getAllGraduateInfo() {
         return graduateInfoRepository.findAll().stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<GraduateInfoDto> getGraduateInfoByFilters(
             String major, String careerPath, String experienceType) {
         return graduateInfoRepository.findByFilters(major, careerPath, experienceType)
@@ -33,11 +35,26 @@ public class GraduateInfoService {
     @Transactional
     public GraduateInfoDto createGraduateInfo(GraduateInfoDto dto) {
         GraduateInfo info = convertToEntity(dto);
-        GraduateInfo saved = graduateInfoRepository.save(info);
-        return convertToDto(saved);
+        GraduateInfo savedInfo = graduateInfoRepository.save(info);
+        return convertToDto(savedInfo);
     }
 
-    public GraduateInfoDto convertToDto(GraduateInfo info) {
+    @Transactional
+    public GraduateInfoDto updateGraduateInfo(Long id, GraduateInfoDto dto) {
+        GraduateInfo info = graduateInfoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("毕业生信息不存在"));
+        
+        updateEntityFromDto(info, dto);
+        GraduateInfo updatedInfo = graduateInfoRepository.save(info);
+        return convertToDto(updatedInfo);
+    }
+
+    @Transactional
+    public void deleteGraduateInfo(Long id) {
+        graduateInfoRepository.deleteById(id);
+    }
+
+    private GraduateInfoDto convertToDto(GraduateInfo info) {
         GraduateInfoDto dto = new GraduateInfoDto();
         dto.setId(info.getId());
         dto.setName(info.getName());
@@ -47,16 +64,21 @@ public class GraduateInfoService {
         dto.setWorkplace(info.getWorkplace());
         dto.setPosition(info.getPosition());
         dto.setLocation(info.getLocation());
-        dto.setExperience(info.getExperience());
-        dto.setExperienceType(info.getExperienceType());
         dto.setGpa(info.getGpa());
         dto.setAwards(info.getAwards());
         dto.setSkills(info.getSkills());
+        dto.setExperience(info.getExperience());
+        dto.setExperienceType(info.getExperienceType());
         return dto;
     }
 
     private GraduateInfo convertToEntity(GraduateInfoDto dto) {
         GraduateInfo info = new GraduateInfo();
+        updateEntityFromDto(info, dto);
+        return info;
+    }
+
+    private void updateEntityFromDto(GraduateInfo info, GraduateInfoDto dto) {
         info.setName(dto.getName());
         info.setMajor(dto.getMajor());
         info.setGraduationYear(dto.getGraduationYear());
@@ -64,11 +86,10 @@ public class GraduateInfoService {
         info.setWorkplace(dto.getWorkplace());
         info.setPosition(dto.getPosition());
         info.setLocation(dto.getLocation());
-        info.setExperience(dto.getExperience());
-        info.setExperienceType(dto.getExperienceType());
         info.setGpa(dto.getGpa());
         info.setAwards(dto.getAwards());
         info.setSkills(dto.getSkills());
-        return info;
+        info.setExperience(dto.getExperience());
+        info.setExperienceType(dto.getExperienceType());
     }
 } 

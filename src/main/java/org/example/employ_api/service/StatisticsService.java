@@ -17,69 +17,61 @@ public class StatisticsService {
         Map<String, Object> statistics = new HashMap<>();
         
         // 获取就业去向分布
-        List<Map<String, Object>> careerPathDistribution = graduateInfoRepository.findAll().stream()
+        Map<String, Long> careerPathCounts = graduateInfoRepository.findAll().stream()
                 .collect(Collectors.groupingBy(
                         GraduateInfo::getCareerPath,
                         Collectors.counting()
-                ))
-                .entrySet().stream()
-                .map(entry -> Map.of(
-                        "name", entry.getKey(),
-                        "value", entry.getValue()
-                ))
+                ));
+        
+        List<Map<String, Object>> careerPathDistribution = careerPathCounts.entrySet().stream()
+                .map(entry -> {
+                    Map<String, Object> item = new HashMap<>();
+                    item.put("name", entry.getKey());
+                    item.put("value", entry.getValue());
+                    return item;
+                })
                 .collect(Collectors.toList());
+        
         statistics.put("careerPathDistribution", careerPathDistribution);
 
         // 获取专业分布
-        List<Map<String, Object>> majorDistribution = graduateInfoRepository.findAll().stream()
+        Map<String, Long> majorCounts = graduateInfoRepository.findAll().stream()
                 .collect(Collectors.groupingBy(
                         GraduateInfo::getMajor,
                         Collectors.counting()
-                ))
-                .entrySet().stream()
-                .map(entry -> Map.of(
-                        "name", entry.getKey(),
-                        "value", entry.getValue()
-                ))
+                ));
+        
+        List<Map<String, Object>> majorDistribution = majorCounts.entrySet().stream()
+                .map(entry -> {
+                    Map<String, Object> item = new HashMap<>();
+                    item.put("name", entry.getKey());
+                    item.put("value", entry.getValue());
+                    return item;
+                })
                 .collect(Collectors.toList());
+        
         statistics.put("majorDistribution", majorDistribution);
 
         // 获取就业趋势（示例数据）
         List<Map<String, Object>> employmentTrends = Arrays.asList(
-                Map.of(
-                        "year", "2019",
-                        "就业率", 65,
-                        "考研率", 25,
-                        "出国率", 10
-                ),
-                Map.of(
-                        "year", "2020",
-                        "就业率", 60,
-                        "考研率", 28,
-                        "出国率", 12
-                ),
-                Map.of(
-                        "year", "2021",
-                        "就业率", 62,
-                        "考研率", 27,
-                        "出国率", 11
-                ),
-                Map.of(
-                        "year", "2022",
-                        "就业率", 63,
-                        "考研率", 26,
-                        "出国率", 11
-                ),
-                Map.of(
-                        "year", "2023",
-                        "就业率", 64,
-                        "考研率", 25,
-                        "出国率", 11
-                )
+                createTrendData("2019", 65, 25, 10),
+                createTrendData("2020", 60, 28, 12),
+                createTrendData("2021", 62, 27, 11),
+                createTrendData("2022", 63, 26, 11),
+                createTrendData("2023", 64, 25, 11)
         );
         statistics.put("employmentTrends", employmentTrends);
 
         return statistics;
+    }
+
+    private Map<String, Object> createTrendData(String year, int employment, int graduate, int overseas) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("year", year);
+        data.put("就业率", employment);
+        data.put("考研率", graduate);
+        data.put("出国率", overseas);
+        return data;
     }
 
     // 可以添加更多统计方法

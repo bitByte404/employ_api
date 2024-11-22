@@ -11,21 +11,14 @@ import CareerTest from './pages/CareerTest';
 import Recommendations from './pages/Recommendations';
 import Statistics from './pages/Statistics';
 import UserManagement from './pages/Admin/UserManagement';
-import GraduateManagement from './pages/Admin/GraduateManagement';
 import SystemSettings from './pages/Admin/SystemSettings';
-import LogViewer from './pages/Admin/LogViewer';
-import DataAnalysis from './pages/Admin/DataAnalysis';
 
 // 私有路由组件
-const PrivateRoute = ({ children, requireAdmin = false }) => {
-  const { isAuthenticated, user } = useSelector(state => state.auth);
+const PrivateRoute = ({ children }) => {
+  const { isAuthenticated } = useSelector(state => state.auth);
   
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
-  }
-
-  if (requireAdmin && user?.role !== 'ROLE_ADMIN') {
-    return <Navigate to="/" />;
   }
 
   return <Layout>{children}</Layout>;
@@ -73,28 +66,13 @@ function App() {
 
         {/* 管理员路由 */}
         <Route path="/admin/users" element={
-          <PrivateRoute requireAdmin>
+          <PrivateRoute>
             <UserManagement />
           </PrivateRoute>
         } />
-        <Route path="/admin/graduates" element={
-          <PrivateRoute requireAdmin>
-            <GraduateManagement />
-          </PrivateRoute>
-        } />
         <Route path="/admin/settings" element={
-          <PrivateRoute requireAdmin>
+          <PrivateRoute>
             <SystemSettings />
-          </PrivateRoute>
-        } />
-        <Route path="/admin/logs" element={
-          <PrivateRoute requireAdmin>
-            <LogViewer />
-          </PrivateRoute>
-        } />
-        <Route path="/admin/analysis" element={
-          <PrivateRoute requireAdmin>
-            <DataAnalysis />
           </PrivateRoute>
         } />
 

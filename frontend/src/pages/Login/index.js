@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { Formik, Form } from 'formik';
@@ -23,14 +23,28 @@ const validationSchema = Yup.object({
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [error, setError] = useState(null);
 
-  const handleSubmit = async (values, { setSubmitting, setErrors }) => {
+  const handleSubmit = async (values, { setSubmitting }) => {
     try {
+      setError(null);
       const response = await authAPI.login(values);
-      dispatch(setCredentials(response.data));
-      navigate('/');
-    } catch (error) {
-      setErrors({ submit: error.response?.data?.message || '登录失败' });
+      
+      if (response.data && response.data.token) {
+        // 保存token到Redux和localStorage
+        dispatch(setCredentials(response.data));
+        localStorage.setItem('token', response.data.token);
+        
+        // 延迟跳转以确保token已保存
+        setTimeout(() => {
+          navigate('/');
+        }, 100);
+      } else {
+        throw new Error('登录响应格式错误');
+      }
+    } catch (err) {
+      console.error('登录失败:', err);
+      setError(err.response?.data?.message || '登录失败，请检查用户名和密码');
     } finally {
       setSubmitting(false);
     }
@@ -85,9 +99,9 @@ const Login = () => {
                     error={touched.password && Boolean(errors.password)}
                     helperText={touched.password && errors.password}
                   />
-                  {errors.submit && (
+                  {error && (
                     <Typography color="error" variant="body2" sx={{ mt: 2 }}>
-                      {errors.submit}
+                      {error}
                     </Typography>
                   )}
                   <Button
