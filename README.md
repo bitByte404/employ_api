@@ -64,6 +64,8 @@
 CREATE DATABASE student_guidance DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
+
+
 ### 2. 配置文件
 修改 `src/main/resources/application.properties`：
 
@@ -242,3 +244,72 @@ src/main/java/org/example/employ_api/
 ``` bash
 mvn test
 ```
+
+## 数据初始化
+### 导入测试数据
+1. 确保已创建数据库并配置好连接：
+```sql
+CREATE DATABASE student_guidance DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+2. 清空并重新插入毕业生信息：
+```sql
+-- 清空表
+TRUNCATE TABLE graduate_info;
+
+-- 插入多样化的毕业生数据
+INSERT INTO graduate_info (
+    name, major, graduation_year, career_path, workplace, 
+    position, location, gpa, awards, skills, 
+    experience, experience_type
+) VALUES 
+-- 就业方向案例
+('张三', '信息管理', '2023', '就业', '腾讯', 
+'产品经理', '深圳', 3.8, '校级奖学金,产品设计大赛一等奖', 'Python,SQL,产品设计,用户研究', 
+'在字节跳动实习3个月，负责抖音电商数据分析；在腾讯实习4个月，参与微信支付产品改进', '实习'),
+
+('李四', '信息管理', '2023', '就业', '阿里巴巴', 
+'数据分析师', '杭州', 3.9, '国家奖学金,数据分析大赛冠军', 'R语言,Python,机器学习,数据可视化', 
+'参与阿里巴巴数据分析实习项目，负责用户行为分析和商业策略优化', '实习'),
+
+-- 考研方向案例
+('王五', '信息管理', '2023', '考研', '清华大学', 
+'信息管理与信息系统', '北京', 3.95, '省级优秀毕业生,学术创新奖', 'Java,研究方法,学术写作', 
+'参与导师科研项目，发表核心期刊论文2篇，获得专利1项', '科研'),
+
+('赵六', '信息管理', '2023', '考研', '北京大学', 
+'管理科学与工程', '北京', 3.85, '校级优秀学生,科研创新奖', 'SPSS,科研方法论,数据挖掘', 
+'主持一项省级大学生创新项目，参与国家自然科学基金项目研究', '科研'),
+
+-- 出国方向案例
+('钱七', '信息管理', '2023', '出国', '哥伦比亚大学', 
+'信息管理', '纽约', 3.7, 'TOEFL:110,GRE:325', '英语,Python,研究方法', 
+'参加国际学术会议，获得会议最佳论文奖；完成一篇英文学术论文', '学术交流'),
+
+('孙八', '信息管理', '2023', '出国', '伦敦大学学院', 
+'数据科学', '伦敦', 3.75, 'IELTS:7.5,编程大赛金奖', '英语,机器学习,深度学习', 
+'参与国际合作项目，与多个国家的团队合作开发AI应用', '项目研究');
+```
+
+3. 导入其他专业的数据：
+```sql
+INSERT INTO graduate_info (
+    name, major, graduation_year, career_path, workplace, 
+    position, location, gpa, awards, skills, 
+    experience, experience_type
+) VALUES 
+('李明', '计算机科学', '2023', '就业', '字节跳动', 
+'后端工程师', '北京', 3.85, '蓝桥杯金奖', 'Java,Spring,MySQL', 
+'负责抖音后端服务开发，参与系统架构设计', '实习'),
+
+('王芳', '数据科学', '2023', '考研', '浙江大学', 
+'人工智能', '杭州', 3.92, '数学建模国赛一等奖', 'Python,机器学习,深度学习', 
+'参与多个AI项目研发，发表SCI论文1篇', '科研');
+```
+
+### 数据库表结构
+主要数据表结构如下：
+1. users - 用户信息表
+2. graduate_info - 毕业生信息表
+3. personality_tests - 性格测试表
+4. career_tests - 职业测试表
