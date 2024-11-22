@@ -1,18 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import {
   Box,
   Button,
-  Card,
-  CardContent,
   TextField,
   Typography,
   Container,
-  Grid,
   Alert,
+  IconButton,
+  InputAdornment,
+  Paper,
+  Grid,
+  Stepper,
+  Step,
+  StepLabel,
 } from '@mui/material';
+import {
+  Visibility,
+  VisibilityOff,
+  Person,
+  Lock,
+  Email,
+  Phone,
+  Badge,
+  School,
+} from '@mui/icons-material';
 import { authAPI } from '../../services/api';
 
 const validationSchema = Yup.object({
@@ -37,16 +51,18 @@ const validationSchema = Yup.object({
     .email('请输入有效的邮箱地址'),
 });
 
+const steps = ['账号信息', '个人信息', '联系方式'];
+
 const Register = () => {
   const navigate = useNavigate();
-  const [error, setError] = React.useState(null);
+  const [activeStep, setActiveStep] = useState(0);
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
       await authAPI.register(values);
-      navigate('/login', { 
-        state: { message: '注册成功，请登录' }
-      });
+      navigate('/login', { state: { message: '注册成功，请登录' } });
     } catch (err) {
       setError(err.response?.data?.message || '注册失败，请稍后重试');
     } finally {
@@ -55,28 +71,61 @@ const Register = () => {
   };
 
   return (
-    <Container component="main" maxWidth="sm">
-      <Box
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          py: 4,
-        }}
-      >
-        <Card sx={{ width: '100%', borderRadius: 2 }}>
-          <CardContent sx={{ p: 4 }}>
-            <Typography variant="h4" align="center" gutterBottom>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+      }}
+    >
+      <Container component="main" maxWidth="md" sx={{ my: 'auto' }}>
+        <Paper
+          elevation={6}
+          sx={{
+            borderRadius: 4,
+            py: 4,
+            px: { xs: 3, md: 6 },
+            background: 'rgba(255, 255, 255, 0.95)',
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <Typography
+              variant="h3"
+              component="h1"
+              gutterBottom
+              sx={{
+                fontWeight: 700,
+                background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}
+            >
               注册账号
             </Typography>
-            <Typography variant="subtitle1" align="center" color="textSecondary" gutterBottom>
+            <Typography
+              variant="subtitle1"
+              gutterBottom
+              sx={{ color: 'text.secondary', mb: 4 }}
+            >
               加入智绘未来，开启你的职业规划之旅
             </Typography>
 
+            <Stepper activeStep={activeStep} sx={{ width: '100%', mb: 4 }}>
+              {steps.map((label) => (
+                <Step key={label}>
+                  <StepLabel>{label}</StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+
             {error && (
-              <Alert severity="error" sx={{ mt: 2, mb: 2 }}>
+              <Alert severity="error" sx={{ width: '100%', mb: 3 }}>
                 {error}
               </Alert>
             )}
@@ -95,120 +144,231 @@ const Register = () => {
               onSubmit={handleSubmit}
             >
               {({ values, errors, touched, handleChange, handleBlur, isSubmitting }) => (
-                <Form>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        name="username"
-                        label="用户名"
-                        value={values.username}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        error={touched.username && Boolean(errors.username)}
-                        helperText={touched.username && errors.username}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        name="realName"
-                        label="真实姓名"
-                        value={values.realName}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        error={touched.realName && Boolean(errors.realName)}
-                        helperText={touched.realName && errors.realName}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        name="password"
-                        label="密码"
-                        type="password"
-                        value={values.password}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        error={touched.password && Boolean(errors.password)}
-                        helperText={touched.password && errors.password}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        name="confirmPassword"
-                        label="确认密码"
-                        type="password"
-                        value={values.confirmPassword}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        error={touched.confirmPassword && Boolean(errors.confirmPassword)}
-                        helperText={touched.confirmPassword && errors.confirmPassword}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        name="studentId"
-                        label="学号"
-                        value={values.studentId}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        error={touched.studentId && Boolean(errors.studentId)}
-                        helperText={touched.studentId && errors.studentId}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        name="phone"
-                        label="手机号"
-                        value={values.phone}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        error={touched.phone && Boolean(errors.phone)}
-                        helperText={touched.phone && errors.phone}
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <TextField
-                        fullWidth
-                        name="email"
-                        label="邮箱"
-                        value={values.email}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        error={touched.email && Boolean(errors.email)}
-                        helperText={touched.email && errors.email}
-                      />
-                    </Grid>
+                <Form style={{ width: '100%' }}>
+                  <Grid container spacing={3}>
+                    {activeStep === 0 && (
+                      <>
+                        <Grid item xs={12}>
+                          <TextField
+                            fullWidth
+                            name="username"
+                            label="用户名"
+                            value={values.username}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.username && Boolean(errors.username)}
+                            helperText={touched.username && errors.username}
+                            InputProps={{
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <Person color="primary" />
+                                </InputAdornment>
+                              ),
+                            }}
+                          />
+                        </Grid>
+                        <Grid item xs={12}>
+                          <TextField
+                            fullWidth
+                            name="password"
+                            label="密码"
+                            type={showPassword ? 'text' : 'password'}
+                            value={values.password}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.password && Boolean(errors.password)}
+                            helperText={touched.password && errors.password}
+                            InputProps={{
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <Lock color="primary" />
+                                </InputAdornment>
+                              ),
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  <IconButton
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    edge="end"
+                                  >
+                                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                                  </IconButton>
+                                </InputAdornment>
+                              ),
+                            }}
+                          />
+                        </Grid>
+                        <Grid item xs={12}>
+                          <TextField
+                            fullWidth
+                            name="confirmPassword"
+                            label="确认密码"
+                            type={showPassword ? 'text' : 'password'}
+                            value={values.confirmPassword}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.confirmPassword && Boolean(errors.confirmPassword)}
+                            helperText={touched.confirmPassword && errors.confirmPassword}
+                            InputProps={{
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <Lock color="primary" />
+                                </InputAdornment>
+                              ),
+                            }}
+                          />
+                        </Grid>
+                      </>
+                    )}
+
+                    {activeStep === 1 && (
+                      <>
+                        <Grid item xs={12} sm={6}>
+                          <TextField
+                            fullWidth
+                            name="realName"
+                            label="真实姓名"
+                            value={values.realName}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.realName && Boolean(errors.realName)}
+                            helperText={touched.realName && errors.realName}
+                            InputProps={{
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <Badge color="primary" />
+                                </InputAdornment>
+                              ),
+                            }}
+                          />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <TextField
+                            fullWidth
+                            name="studentId"
+                            label="学号"
+                            value={values.studentId}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.studentId && Boolean(errors.studentId)}
+                            helperText={touched.studentId && errors.studentId}
+                            InputProps={{
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <School color="primary" />
+                                </InputAdornment>
+                              ),
+                            }}
+                          />
+                        </Grid>
+                      </>
+                    )}
+
+                    {activeStep === 2 && (
+                      <>
+                        <Grid item xs={12} sm={6}>
+                          <TextField
+                            fullWidth
+                            name="phone"
+                            label="手机号"
+                            value={values.phone}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.phone && Boolean(errors.phone)}
+                            helperText={touched.phone && errors.phone}
+                            InputProps={{
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <Phone color="primary" />
+                                </InputAdornment>
+                              ),
+                            }}
+                          />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <TextField
+                            fullWidth
+                            name="email"
+                            label="邮箱"
+                            value={values.email}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={touched.email && Boolean(errors.email)}
+                            helperText={touched.email && errors.email}
+                            InputProps={{
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <Email color="primary" />
+                                </InputAdornment>
+                              ),
+                            }}
+                          />
+                        </Grid>
+                      </>
+                    )}
                   </Grid>
 
-                  <Button
-                    fullWidth
-                    size="large"
-                    type="submit"
-                    variant="contained"
-                    disabled={isSubmitting}
-                    sx={{ mt: 3, mb: 2 }}
-                  >
-                    {isSubmitting ? '注册中...' : '注册'}
-                  </Button>
+                  <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between' }}>
+                    <Button
+                      variant="outlined"
+                      onClick={() => setActiveStep((prev) => prev - 1)}
+                      disabled={activeStep === 0}
+                    >
+                      上一步
+                    </Button>
+                    {activeStep === steps.length - 1 ? (
+                      <Button
+                        type="submit"
+                        variant="contained"
+                        disabled={isSubmitting}
+                        sx={{
+                          background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+                          color: 'white',
+                          '&:hover': {
+                            background: 'linear-gradient(45deg, #1976d2 30%, #1e88e5 90%)',
+                          },
+                        }}
+                      >
+                        {isSubmitting ? '注册中...' : '完成注册'}
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="contained"
+                        onClick={() => setActiveStep((prev) => prev + 1)}
+                        sx={{
+                          background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+                          color: 'white',
+                          '&:hover': {
+                            background: 'linear-gradient(45deg, #1976d2 30%, #1e88e5 90%)',
+                          },
+                        }}
+                      >
+                        下一步
+                      </Button>
+                    )}
+                  </Box>
 
-                  <Typography variant="body2" align="center">
-                    已有账号？{' '}
-                    <Link to="/login" style={{ textDecoration: 'none', color: 'primary.main' }}>
-                      立即登录
-                    </Link>
-                  </Typography>
+                  <Box sx={{ mt: 3, textAlign: 'center' }}>
+                    <Typography variant="body2" color="text.secondary">
+                      已有账号？{' '}
+                      <Link
+                        to="/login"
+                        style={{
+                          textDecoration: 'none',
+                          color: '#2196F3',
+                          fontWeight: 500,
+                        }}
+                      >
+                        立即登录
+                      </Link>
+                    </Typography>
+                  </Box>
                 </Form>
               )}
             </Formik>
-          </CardContent>
-        </Card>
-      </Box>
-    </Container>
+          </Box>
+        </Paper>
+      </Container>
+    </Box>
   );
 };
 

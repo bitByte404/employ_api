@@ -11,7 +11,17 @@ import {
   TextField,
   Typography,
   Container,
+  Alert,
+  IconButton,
+  InputAdornment,
+  Paper,
 } from '@mui/material';
+import {
+  Visibility,
+  VisibilityOff,
+  Person,
+  Lock,
+} from '@mui/icons-material';
 import { authAPI } from '../../services/api';
 import { setCredentials } from '../../store/authSlice';
 
@@ -23,27 +33,16 @@ const validationSchema = Yup.object({
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
       setError(null);
       const response = await authAPI.login(values);
-      
-      if (response.data && response.data.token) {
-        // 保存token到Redux和localStorage
-        dispatch(setCredentials(response.data));
-        localStorage.setItem('token', response.data.token);
-        
-        // 延迟跳转以确保token已保存
-        setTimeout(() => {
-          navigate('/');
-        }, 100);
-      } else {
-        throw new Error('登录响应格式错误');
-      }
+      dispatch(setCredentials(response.data));
+      navigate('/');
     } catch (err) {
-      console.error('登录失败:', err);
       setError(err.response?.data?.message || '登录失败，请检查用户名和密码');
     } finally {
       setSubmitting(false);
@@ -51,82 +50,155 @@ const Login = () => {
   };
 
   return (
-    <Container component="main" maxWidth="xs">
-      <Box
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Card sx={{ width: '100%', borderRadius: 2 }}>
-          <CardContent sx={{ p: 4 }}>
-            <Typography variant="h4" align="center" gutterBottom>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+      }}
+    >
+      <Container component="main" maxWidth="sm" sx={{ my: 'auto' }}>
+        <Paper
+          elevation={6}
+          sx={{
+            borderRadius: 4,
+            py: 4,
+            px: { xs: 3, md: 6 },
+            background: 'rgba(255, 255, 255, 0.95)',
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <Typography
+              variant="h3"
+              component="h1"
+              gutterBottom
+              sx={{
+                fontWeight: 700,
+                background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}
+            >
               智绘未来
             </Typography>
-            <Typography variant="subtitle1" align="center" color="textSecondary" gutterBottom>
+            <Typography
+              variant="subtitle1"
+              gutterBottom
+              sx={{ color: 'text.secondary', mb: 4 }}
+            >
               高校学生发展智导站
             </Typography>
+
+            {error && (
+              <Alert severity="error" sx={{ width: '100%', mb: 3 }}>
+                {error}
+              </Alert>
+            )}
+
             <Formik
               initialValues={{ username: '', password: '' }}
               validationSchema={validationSchema}
               onSubmit={handleSubmit}
             >
               {({ values, errors, touched, handleChange, handleBlur, isSubmitting }) => (
-                <Form>
+                <Form style={{ width: '100%' }}>
                   <TextField
                     fullWidth
                     margin="normal"
                     name="username"
                     label="用户名"
+                    variant="outlined"
                     value={values.username}
                     onChange={handleChange}
                     onBlur={handleBlur}
                     error={touched.username && Boolean(errors.username)}
                     helperText={touched.username && errors.username}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Person color="primary" />
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={{ mb: 3 }}
                   />
                   <TextField
                     fullWidth
                     margin="normal"
                     name="password"
                     label="密码"
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
+                    variant="outlined"
                     value={values.password}
                     onChange={handleChange}
                     onBlur={handleBlur}
                     error={touched.password && Boolean(errors.password)}
                     helperText={touched.password && errors.password}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Lock color="primary" />
+                        </InputAdornment>
+                      ),
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() => setShowPassword(!showPassword)}
+                            edge="end"
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={{ mb: 4 }}
                   />
-                  {error && (
-                    <Typography color="error" variant="body2" sx={{ mt: 2 }}>
-                      {error}
-                    </Typography>
-                  )}
                   <Button
                     fullWidth
                     size="large"
                     type="submit"
                     variant="contained"
                     disabled={isSubmitting}
-                    sx={{ mt: 3, mb: 2 }}
+                    sx={{
+                      py: 1.5,
+                      background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+                      color: 'white',
+                      '&:hover': {
+                        background: 'linear-gradient(45deg, #1976d2 30%, #1e88e5 90%)',
+                      },
+                    }}
                   >
-                    登录
+                    {isSubmitting ? '登录中...' : '登录'}
                   </Button>
-                  <Typography variant="body2" align="center">
-                    还没有账号？{' '}
-                    <Link to="/register" style={{ textDecoration: 'none', color: 'primary.main' }}>
-                      立即注册
-                    </Link>
-                  </Typography>
+
+                  <Box sx={{ mt: 3, textAlign: 'center' }}>
+                    <Typography variant="body2" color="text.secondary">
+                      还没有账号？{' '}
+                      <Link
+                        to="/register"
+                        style={{
+                          textDecoration: 'none',
+                          color: '#2196F3',
+                          fontWeight: 500,
+                        }}
+                      >
+                        立即注册
+                      </Link>
+                    </Typography>
+                  </Box>
                 </Form>
               )}
             </Formik>
-          </CardContent>
-        </Card>
-      </Box>
-    </Container>
+          </Box>
+        </Paper>
+      </Container>
+    </Box>
   );
 };
 
