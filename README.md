@@ -54,7 +54,7 @@
 
 ### 环境要求
 - JDK 17+
-- Node.js 16+
+- Node.js 16+   
 - MySQL 8.0+
 - Maven 3.6+
 
@@ -175,6 +175,7 @@ Authorization: Bearer {token}
 ``` http
 GET /api/predictions/graduate-school
 Authorization: Bearer {token}
+```
 
 
 #### 出国院校预测

@@ -24,14 +24,19 @@ import {
   WorkspacePremium,
 } from '@mui/icons-material';
 import { recommendationAPI } from '../../services/api';
+import { userAPI } from '../../services/api';
+import { useNavigate } from 'react-router-dom';
 
 const Recommendations = () => {
   const [recommendations, setRecommendations] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [profileComplete, setProfileComplete] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchRecommendations();
+    checkProfileCompleteness();
   }, []);
 
   const fetchRecommendations = async () => {
@@ -58,6 +63,35 @@ const Recommendations = () => {
     }
   };
 
+  const checkProfileCompleteness = async () => {
+    try {
+      const response = await userAPI.getProfile();
+      const profile = response.data;
+      
+      // 检查必要字段是否都已填写
+      const requiredFields = [
+        'realName',
+        'studentId',
+        'major',
+        'politicalStatus',
+        'hometown',
+        'gpa',
+        'phone',
+        'email',
+        'personalityType',
+        'careerInterests'
+      ];
+      
+      const isComplete = requiredFields.every(field => 
+        profile[field] !== null && profile[field] !== undefined && profile[field] !== ''
+      );
+      
+      setProfileComplete(isComplete);
+    } catch (error) {
+      console.error('获取用户信息失败:', error);
+    }
+  };
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
@@ -76,6 +110,24 @@ const Recommendations = () => {
 
   return (
     <Box sx={{ p: 3, maxWidth: 1200, mx: 'auto' }}>
+      {!profileComplete && (
+        <Alert 
+          severity="warning" 
+          sx={{ mb: 3 }}
+          action={
+            <Button 
+              color="inherit" 
+              size="small" 
+              onClick={() => navigate('/profile')}
+            >
+              完善信息
+            </Button>
+          }
+        >
+          您的个人信息尚未完善，当前推荐结果可能不够准确。建议您完善个人信息以获得更精准的推荐。
+        </Alert>
+      )}
+
       {/* 标题部分 */}
       <Paper 
         elevation={0}

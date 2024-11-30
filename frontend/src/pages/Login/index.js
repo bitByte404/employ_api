@@ -26,8 +26,17 @@ import { authAPI } from '../../services/api';
 import { setCredentials } from '../../store/authSlice';
 
 const validationSchema = Yup.object({
-  username: Yup.string().required('用户名是必填项'),
-  password: Yup.string().required('密码是必填项'),
+  username: Yup.string()
+    .required('用户名是必填项')
+    .min(4, '用户名至少4个字符'),
+  password: Yup.string()
+    .required('密码是必填项')
+    .min(6, '密码至少6个字符')
+    .max(20, '密码最多20个字符')
+    .matches(
+      /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,20}$/,
+      '密码必须包含字母和数字'
+    ),
 });
 
 const Login = () => {

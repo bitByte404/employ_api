@@ -33,8 +33,22 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody UserRegistrationDto registrationDto) {
-        User user = userService.registerUser(registrationDto);
-        return ResponseEntity.ok("用户注册成功");
+        try {
+            User user = userService.registerUser(registrationDto);
+            
+            // 创建认证token
+            String jwt = jwtService.generateToken(user);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "用户注册成功");
+            response.put("token", jwt);
+            response.put("username", user.getUsername());
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                .body(Map.of("message", e.getMessage()));
+        }
     }
 
     @PostMapping("/login")

@@ -28,6 +28,8 @@ import {
   School,
 } from '@mui/icons-material';
 import { authAPI } from '../../services/api';
+import { setCredentials } from '../../store/authSlice';
+import { useDispatch } from 'react-redux';
 
 const validationSchema = Yup.object({
   username: Yup.string()
@@ -35,7 +37,12 @@ const validationSchema = Yup.object({
     .min(4, '用户名至少4个字符'),
   password: Yup.string()
     .required('密码是必填项')
-    .min(6, '密码至少6个字符'),
+    .min(6, '密码至少6个字符')
+    .max(20, '密码最多20个字符')
+    .matches(
+      /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,20}$/,
+      '密码必须包含字母和数字'
+    ),
   confirmPassword: Yup.string()
     .required('请确认密码')
     .oneOf([Yup.ref('password'), null], '两次输入的密码不一致'),
@@ -58,12 +65,25 @@ const Register = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
+  const dispatch = useDispatch();
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      await authAPI.register(values);
-      navigate('/login', { state: { message: '注册成功，请登录' } });
+      setError(null);
+      const response = await authAPI.register(values);
+      
+      if (response.data.token) {
+        // 如果注册成功并返回了token，直接登录
+        dispatch(setCredentials(response.data));
+        navigate('/');
+      } else {
+        // 否则跳转到登录页面
+        navigate('/login', { 
+          state: { message: '注册成功，请登录' }
+        });
+      }
     } catch (err) {
+      console.error('注册失败:', err);
       setError(err.response?.data?.message || '注册失败，请稍后重试');
     } finally {
       setSubmitting(false);
